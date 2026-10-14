@@ -1,0 +1,37 @@
+# Release gate on conversation quality using POST /v1/evaluate (available today).
+# Runs your agent against a fixed set of prompts in CI, scores each transcript with the evidence judge,
+# and fails the job if any critical guardrail is breached or the score drops below a threshold.
+# Requires SPARRING_API_KEY as a repository/organisation secret.
+#
+# Arena runs via API key (POST /v1/arena/runs, regression suites built from production incidents) are on the roadmap;
+# today Arena runs from the web console and the `sparring-arena` CLI.
+name: conversation-quality-gate
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Produce transcripts from your agent (replace with your own harness)
+        run: |
+          # Expected output: transcripts/*.json each shaped like the /v1/evaluate body (situation, transcript[], guardrails[])
+          ls transcripts/*.json
+      - name: Score each transcript and gate
+        env:
+          SPARRING_API_KEY: ${{ secrets.SPARRING_API_KEY }}
+        run: |
+          fail=0
+          for f in transcripts/*.json; do
+            R=$(curl -sS https://app.sparringhq.com/api/v1/evaluate -H "Authorization: Bearer $SPARRING_API_KEY" -H "Content-Type: application/json" -d @"$f")
+            python3 - "$f" <<'PY' "$R" || fail=1
+          import sys, json
+          f, r = sys.argv[1], json.loads(sys.argv[2])
+          breached = [g for g in r.get("guardrails", []) if not g.get("held") and g.get("severity") == "critical"]
+          print(f"{f}: score={r.get('score')} stars={r.get('stars')} critical_breaches={len(breached)}")
+          for g in breached: print("   CRITICAL:", g.get("id"), "—", g.get("evidence"))
+          sys.exit(1 if breached or (r.get("score") or 0) < 60 else 0)
+          PY
+          done
+          exit $fail
