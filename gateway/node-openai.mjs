@@ -7,7 +7,7 @@ const client = new OpenAI({
 });
 
 const { data, response } = await client.chat.completions
-  .create({ model: "gpt-5.6-sol", max_completion_tokens: 100, messages: [{ role: "user", content: "Say hello in one sentence." }] })
+  .create({ model: "gemini-4-argon", max_completion_tokens: 100, messages: [{ role: "user", content: "Say hello in one sentence." }] })   // default model: Gemini 4 on Vertex AI; gpt-* also accepted
   .withResponse();
 
 console.log(data.choices[0].message.content);
