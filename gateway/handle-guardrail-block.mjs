@@ -11,7 +11,7 @@ import Anthropic from "@anthropic-ai/sdk";
 const client = new Anthropic({ baseURL: "https://app.sparringhq.com/api/v1/models/anthropic", apiKey: process.env.SPARRING_API_KEY });
 
 try {
-  const r = await client.messages.create({ model: "claude-haiku-4-5-20251001", max_tokens: 50, messages: [{ role: "user", content: "My card is 4111 1111 1111 1111, confirm it." }] });
+  const r = await client.messages.create({ model: "gemini-4-argon", max_tokens: 50, messages: [{ role: "user", content: "My card is 4111 1111 1111 1111, confirm it." }] });
   console.log(r.content[0].text);
 } catch (e) {
   if (e?.status === 422 && e?.error?.error?.type === "guardrail_blocked") {

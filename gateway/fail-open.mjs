@@ -8,7 +8,7 @@ async function gatewayHealthy() {
   try {
     const r = await fetch(`${GATEWAY}/health`, { signal: AbortSignal.timeout(2000) });   // no auth, not billed
     if (!r.ok) return false;
-    const j = await r.json();                                   // { status: "ok" | "degraded" | "down", channels: {...} }
+    const j = await r.json();                                   // { status: "ok" | "degraded" | "down", default_channel: "vertex", channels: {...} }
     return j.status !== "down";
   } catch { return false; }
 }

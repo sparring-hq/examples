@@ -19,7 +19,9 @@ Minimal, runnable examples for the [Sparring Gateway and API](https://sparringhq
 2. `export SPARRING_API_KEY=sk_...`
 3. Run any example. Node examples need Node 20+ and the provider SDK (`npm i @anthropic-ai/sdk openai`); Python needs `pip install openai`.
 
-Every gateway response carries `X-Sparring-Guardrail` (pass · flag:<rules> · block:<rules>), `X-Sparring-Upstream` (byok · managed · official), `X-Sparring-Credits` (model tokens at list; 0 for BYOK), `X-Sparring-CU` (Conversation Units for assurance work) and `X-Request-Id`.
+By default every call runs on **Vertex AI inside Google Cloud** with **Gemini 4 (`gemini-4-argon`)**, on all three wires (Anthropic Messages, OpenAI Chat Completions, OpenAI Responses). Organisations can switch to their own provider key (BYOK) or Sparring's managed channel in Settings → Developer → Model channel, and can disable non-Google fail-over entirely.
+
+Every gateway response carries `X-Sparring-Guardrail` (pass · flag:<rules> · block:<rules>), `X-Sparring-Upstream` (vertex · byok · managed · official), `X-Sparring-Credits` (model tokens at list; 0 for BYOK), `X-Sparring-CU` (Conversation Units for assurance work) and `X-Request-Id`.
 
 Model tokens pass through at the provider's list price. Assurance work is metered in Conversation Units (1 CU = US$0.02). Details: https://sparringhq.com/pricing/
 
